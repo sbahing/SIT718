@@ -40,3 +40,11 @@ selectedData = subsetData[,-5]
 normalizedData = log(scaleData(selectedData) + 1)
 
 write.table(normalizedData, "SAJESH-transformed.txt", col.names = FALSE, append = FALSE, sep=",", row.names = FALSE)
+
+# Task 3.i -> Models
+
+fit.QAM(normalizedData, "./output/output.txt", "./output/status.txt" )
+fit.QAM(normalizedData, "./output/output1.txt", "./output/status1.txt", g=PM05, g.inv = invPM05)
+fit.QAM(normalizedData, "./output/output2.txt", "./output/status2.txt", g=QM, g.inv = invQM)
+fit.OWA(normalizedData, "./output/output3.txt", "./output/status3.txt")
+fit.choquet(normalizedData, "./output/output4.txt", "./output/status4.txt")
