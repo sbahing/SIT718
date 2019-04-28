@@ -17,7 +17,7 @@ plot(subsetData[,6], subsetData[,4], type = "p", xlab = "Energy use of appliance
 
 plot( subsetData[,6], subsetData[,5], type = "p", xlab = "Energy use of appliances in Wh", ylab = "Visibility", col = "blue", pch = 4 )
 
-#Histograms
+# Histograms
 hist(subsetData[,1], main = "Histogram", xlab = "Temperature in kitchen", col = "skyblue")
 hist(subsetData[,2], main = "Histogram", xlab = "Humidity in kitchen", col = "skyblue")
 hist(subsetData[,3], main = "Histogram", xlab = "Temperature outside", col = "skyblue")
@@ -25,5 +25,18 @@ hist(subsetData[,4], main = "Histogram", xlab = "Humidity outside", col = "skybl
 hist(subsetData[,5], main = "Histogram", xlab = "Visibility", col = "skyblue")
 hist(subsetData[,6], main = "Histogram", xlab = "Energy use", col = "skyblue")
 
-#Task 2.i -> Data transformation
+# Task 2.i -> Data transformation
+# Selecting only temperatures and humidity inside and outside the kitchen and variable of interest Y
+# Visibility ignored from this point onwards
 
+scaleData = function (temp) {
+  xScaled = (temp - min(temp)) / (max(temp) - min(temp))
+  
+  return (xScaled)
+}
+
+selectedData = subsetData[,-5]
+
+normalizedData = log(scaleData(selectedData) + 1)
+
+write.table(normalizedData, "SAJESH-transformed.txt", col.names = FALSE, append = FALSE, sep=",", row.names = FALSE)
