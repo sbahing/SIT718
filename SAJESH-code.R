@@ -42,7 +42,8 @@ normalizedData = log(scaleData(selectedData) + 1)
 write.table(normalizedData, "SAJESH-transformed.txt", col.names = FALSE, append = FALSE, sep=",", row.names = FALSE)
 
 # Task 3.i -> Models
-
+#
+# output directory is required in the project directory
 fit.QAM(normalizedData, "./output/output.txt", "./output/status.txt" )
 fit.QAM(normalizedData, "./output/output1.txt", "./output/status1.txt", g=PM05, g.inv = invPM05)
 fit.QAM(normalizedData, "./output/output2.txt", "./output/status2.txt", g=QM, g.inv = invQM)
