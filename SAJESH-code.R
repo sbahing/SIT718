@@ -41,7 +41,7 @@ selectedData = subsetData[,-5]
 # before transformation checking the skewness of each variables
 library(e1071)
 apply(selectedData, 2, skewness)
-#        V1         V2         V3         V5         V6 
+#        V1         V2         V3         V4         V6 
 #   0.2841859  0.2500231 -0.1818761 -0.1063660  1.6146097 
 
 scaleData = function (temp) {
@@ -50,7 +50,7 @@ scaleData = function (temp) {
   return (xScaled)
 }
 
-# Applying log transformation for all the variables
+# Applying cube root transformation for all the variables
 normalizedData = (selectedData) ^ (1/3)
 # Nans were produed for 3rd variable as there might be values lower than 0 which wont work with log function
 # Since, variable 3 is already not heavily skewed as we checked before with skewness function I will just keep
@@ -60,12 +60,15 @@ normalizedData[,3] = selectedData[,3]
 apply(normalizedData, 2, skewness)
 #   V1          V2          V3          V4          V6 
 #0.15144969  0.05133773 -0.18187609 -0.27646129  0.76731481 
-# Looks like we skewed fourth variable even more with log function so I will use original value for this
-# Variable as well
+# Looks like we skewed fourth variable even more with cube root transformation so I will use original 
+# value for this variable as well
 normalizedData[,4] = selectedData[,4]
 
-# Since 5th variable is heavily skewed we can use log function for this variable to make it more normally distributed
+# Since Y is heavily skewed we can use log function for this variable to make it more normally distributed
+# using log transformation for Y instead of cube root transformation
 normalizedData[,5] = log(selectedData[,5])
+
+skewness(normalizedData[,5]) #0.3336642
 
 #Transforming all the data within 0-1 range
 scaledData = apply(normalizedData, 2, scaleData)
