@@ -34,16 +34,15 @@ cor(subsetData) # Viewing correlation of each variale with Y (V6)
 # V5  0.17281179  0.07361037  0.18335703 -0.09163847  1.00000000 0.2835517
 # V6  0.34223927  0.13085504  0.43116199  0.07430190  0.28355171 1.0000000
 
-# Since V4 i.e. Humidity outside kitchen seems to have way less correleation I will ignore that
+# Since V4 i.e. Humidity outside kitchen seems to have way less correleation with Y I will ignore that
 # variable from this point onwards.
-selectedData = subsetData[,-4]
+selectedData = subsetData[,-5]
 
 # before transformation checking the skewness of each variables
-
 library(e1071)
 apply(selectedData, 2, skewness)
 #        V1         V2         V3         V5         V6 
-#   0.2841859  0.2500231 -0.1818761  0.7229380  1.6146097 
+#   0.2841859  0.2500231 -0.1818761 -0.1063660  1.6146097 
 
 scaleData = function (temp) {
   xScaled = (temp - min(temp)) / (max(temp) - min(temp))
@@ -51,25 +50,25 @@ scaleData = function (temp) {
   return (xScaled)
 }
 
-# Applying cuberoot transformation on x1, x2 and x4 as they seems to be less skewed.
-# x3 is not normalized as this variable is not very skewed originally and applying transformation
-# such as log, square root, cuberoot only made the skewness worse.
-# For x5, I used log transformation as it was heavely skewed.
-v1 = selectedData [,1] ^ (1/3)
-v2 = selectedData [,2] ^ (1/3)
-v3 = selectedData [,3]
-v4 = selectedData [,4] ^ (1/3)
-v5 = log (selectedData[,5])
-
-normalizedData = list('x1' = v1, 'x2' = v2, 'x3' = v3, 'x4' = v4, 'x5' = v5)
-
-normalizedData = as.data.frame(normalizedData)
-
-scaledData = apply(normalizedData, 2, scaleData)
+# Applying log transformation for all the variables
+normalizedData = (selectedData) ^ (1/3)
+# Nans were produed for 3rd variable as there might be values lower than 0 which wont work with log function
+# Since, variable 3 is already not heavily skewed as we checked before with skewness function I will just keep
+# the original value here
+normalizedData[,3] = selectedData[,3]
 
 apply(normalizedData, 2, skewness)
-#     X1          X2         X3           X4           X5
-# 0.15144969  0.05133773 -0.18187609  0.05201029  0.33366416
+#   V1          V2          V3          V4          V6 
+#0.15144969  0.05133773 -0.18187609 -0.27646129  0.76731481 
+# Looks like we skewed fourth variable even more with log function so I will use original value for this
+# Variable as well
+normalizedData[,4] = selectedData[,4]
+
+# Since 5th variable is heavily skewed we can use log function for this variable to make it more normally distributed
+normalizedData[,5] = log(selectedData[,5])
+
+#Transforming all the data within 0-1 range
+scaledData = apply(normalizedData, 2, scaleData)
 
 write.table(scaledData, "SAJESH-transformed.txt", col.names = FALSE, append = FALSE, sep=",", row.names = FALSE)
 
@@ -79,32 +78,17 @@ source(file = "./AggWaFit718.R")
 
 #Task 3.ii  -> Models
 # output directory is required in the project directory
-fit.QAM(normalizedData, "./output/output.txt", "./output/status.txt" )
-fit.QAM(normalizedData, "./output/output1.txt", "./output/status1.txt", g=PM05, g.inv = invPM05)
-fit.QAM(normalizedData, "./output/output2.txt", "./output/status2.txt", g=QM, g.inv = invQM)
-fit.OWA(normalizedData, "./output/output3.txt", "./output/status3.txt")
-fit.choquet(normalizedData, "./output/output4.txt", "./output/status4.txt")
+fit.QAM(scaledData, "./output/output.txt", "./output/status.txt" )
+fit.QAM(scaledData, "./output/output1.txt", "./output/status1.txt", g=PM05, g.inv = invPM05)
+fit.QAM(scaledData, "./output/output2.txt", "./output/status2.txt", g=QM, g.inv = invQM)
+fit.OWA(scaledData, "./output/output3.txt", "./output/status3.txt")
+fit.choquet(scaledData, "./output/output4.txt", "./output/status4.txt")
 
 #Task 4.i
-input = scaleData(sqrt(c(18,44,4,74.8)))
-weights = c(0.550409014516637,0.214286745589743,0.120432080374135,0.114872159519482)
 
-cweights = c(0
-             ,0
-             ,0
-             ,0.193637956140186
-             ,0.403822529954561
-             ,0.279041769700155
-             ,0.725165889386119
-             ,0.0212347951826433
-             ,0.0212347951826433
-             ,0.0212347951826433
-             ,0.837194766749031
-             ,0.420888145066684
-             ,0.745010462552994
-             ,0.420888145066693
-             ,0.999999999999913)
+input = c(18,44,4,74.8) ^ (1/3)
+weights = read.table("weights")[,2]
 
-QAM(input, weights)
+Y = choquet(input, weights)
+(Y) ^ 3 #16.27918
 
-choquet(input, cweights)
