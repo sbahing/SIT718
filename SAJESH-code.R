@@ -5,7 +5,7 @@ data = as.matrix(read.table('./Energy19.txt'))
 subsetData = data[1:300,]
 
 # Task 1.iv -> Scatter plots and histograms
-plot(subsetData[,6],  subsetData[,1], type = "p", ylab = "Energy use of appliances in Wh", xlab = "Temperature in kitchen (Celcius)", col = "blue", pch = 4 )
+plot(subsetData[,6],  subsetData[,1], type = "p", xlab = "Energy use of appliances in Wh", ylab = "Temperature in kitchen (Celcius)", col = "blue", pch = 4 )
 
 plot(subsetData[,6], subsetData[,2], type = "p", xlab = "Energy use of appliances in Wh",  ylab = "Humidity in kitchen", col = "blue", pch = 4 )
 
@@ -24,8 +24,26 @@ hist(subsetData[,5], main = "Histogram", xlab = "Visibility", col = "skyblue")
 hist(subsetData[,6], main = "Histogram", xlab = "Energy use", col = "skyblue")
 
 # Task 2.i -> Data transformation
-# Selecting only temperatures and humidity inside and outside the kitchen and variable of interest Y
-# Visibility ignored from this point onwards
+
+cor(subsetData) # Viewing correlation of each variale with Y (V6)
+#          V1          V2          V3          V4          V5        V6
+# V1  1.00000000  0.04815762 -0.06176143  0.03683993  0.17281179 0.3422393
+# V2  0.04815762  1.00000000  0.38211440 -0.10955013  0.07361037 0.1308550
+# V3 -0.06176143  0.38211440  1.00000000 -0.48099781  0.18335703 0.4311620
+# V4  0.03683993 -0.10955013 -0.48099781  1.00000000 -0.09163847 0.0743019
+# V5  0.17281179  0.07361037  0.18335703 -0.09163847  1.00000000 0.2835517
+# V6  0.34223927  0.13085504  0.43116199  0.07430190  0.28355171 1.0000000
+
+# Since V4 i.e. Humidity outside kitchen seems to have way less correleation I will ignore that
+# variable from this point onwards.
+selectedData = subsetData[,-4]
+
+# before transformation checking the skewness of each variables
+
+library(e1071)
+apply(selectedData, 2, skewness)
+#        V1         V2         V3         V5         V6 
+#   0.2841859  0.2500231 -0.1818761  0.7229380  1.6146097 
 
 scaleData = function (temp) {
   xScaled = (temp - min(temp)) / (max(temp) - min(temp))
@@ -33,12 +51,27 @@ scaleData = function (temp) {
   return (xScaled)
 }
 
-selectedData = subsetData[,-5]
-selectedData = log(selectedData + 1)
-normalizedData = apply(selectedData, 2, scaleData)
-summary(normalizedData)
+# Applying cuberoot transformation on x1, x2 and x4 as they seems to be less skewed.
+# x3 is not normalized as this variable is not very skewed originally and applying transformation
+# such as log, square root, cuberoot only made the skewness worse.
+# For x5, I used log transformation as it was heavely skewed.
+v1 = selectedData [,1] ^ (1/3)
+v2 = selectedData [,2] ^ (1/3)
+v3 = selectedData [,3]
+v4 = selectedData [,4] ^ (1/3)
+v5 = log (selectedData[,5])
 
-write.table(normalizedData, "SAJESH-transformed.txt", col.names = FALSE, append = FALSE, sep=",", row.names = FALSE)
+normalizedData = list('x1' = v1, 'x2' = v2, 'x3' = v3, 'x4' = v4, 'x5' = v5)
+
+normalizedData = as.data.frame(normalizedData)
+
+scaledData = apply(normalizedData, 2, scaleData)
+
+apply(normalizedData, 2, skewness)
+#     X1          X2         X3           X4           X5
+# 0.15144969  0.05133773 -0.18187609  0.05201029  0.33366416
+
+write.table(scaledData, "SAJESH-transformed.txt", col.names = FALSE, append = FALSE, sep=",", row.names = FALSE)
 
 # Task 3.i 
 #
