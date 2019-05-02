@@ -24,18 +24,10 @@ hist(subsetData[,5], main = "Histogram", xlab = "Visibility", col = "skyblue")
 hist(subsetData[,6], main = "Histogram", xlab = "Energy use", col = "skyblue")
 
 # Task 2.i -> Data transformation
-
-cor(subsetData) # Viewing correlation of each variale with Y (V6)
-#          V1          V2          V3          V4          V5        V6
-# V1  1.00000000  0.04815762 -0.06176143  0.03683993  0.17281179 0.3422393
-# V2  0.04815762  1.00000000  0.38211440 -0.10955013  0.07361037 0.1308550
-# V3 -0.06176143  0.38211440  1.00000000 -0.48099781  0.18335703 0.4311620
-# V4  0.03683993 -0.10955013 -0.48099781  1.00000000 -0.09163847 0.0743019
-# V5  0.17281179  0.07361037  0.18335703 -0.09163847  1.00000000 0.2835517
-# V6  0.34223927  0.13085504  0.43116199  0.07430190  0.28355171 1.0000000
-
-# Since V4 i.e. Humidity outside kitchen seems to have way less correleation with Y I will ignore that
-# variable from this point onwards.
+# Visibility from weather station seems like unreleated data as appliances works in or around the house that
+# it belongs to. Since, task also does not specifies any criteria to choose the variables. I am ignoring
+# 5th variable from this point onwards. Ofcourse correlations can be tested with Y so that variable with 
+# least correlation can be ignored. But, I will just ignore 5th variable.
 selectedData = subsetData[,-5]
 
 # before transformation checking the skewness of each variables
@@ -87,8 +79,7 @@ fit.QAM(scaledData, "./output/output2.txt", "./output/status2.txt", g=QM, g.inv 
 fit.OWA(scaledData, "./output/output3.txt", "./output/status3.txt")
 fit.choquet(scaledData, "./output/output4.txt", "./output/status4.txt")
 
-#Task 4.i
-
+# Task 4.i
 input = c(18,44,4,74.8) ^ (1/3)
 weights = read.table("weights")[,2]
 
