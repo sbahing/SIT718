@@ -44,7 +44,7 @@ scaleData = function (temp) {
 
 # Applying cube root transformation for all the variables
 normalizedData = (selectedData) ^ (1/3)
-# Nans were produed for 3rd variable as there might be values lower than 0 which wont work with log function
+# Nans were produed for 3rd variable as there might be values lower than 0
 # Since, variable 3 is already not heavily skewed as we checked before with skewness function I will just keep
 # the original value here
 normalizedData[,3] = selectedData[,3]
