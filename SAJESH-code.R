@@ -80,7 +80,7 @@ fit.OWA(scaledData, "./output/output3.txt", "./output/status3.txt")
 fit.choquet(scaledData, "./output/output4.txt", "./output/status4.txt")
 
 # Task 4.i
-input = c(8,44,4,74.8) ^ (1/3)
+input = c(18,44,4,74.8) ^ (1/3)
 weights = read.table("weights")[,2]
 
 Y = choquet(input, weights)
